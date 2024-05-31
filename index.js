@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         ClaudeExtended
 // @namespace    http://tampermonkey.net/
-// @version      2024-05-31
+// @version      2024-05-31.2
 // @description  try to take over the world!
 // @author       Steeve Lefort
 // @match        https://claude.ai/*
@@ -65,15 +65,15 @@
         onload: function(response) {
           const parser = new DOMParser();
           const html = parser.parseFromString(response.responseText, 'text/html');
-          let main = html.querySelector("main");
-          if (main === null) {
-            main = html.querySelector("body");
-          }
-          const scripts = main.querySelectorAll("script,link,img,svg");
-          for (const script of scripts) {
-            script.remove();
-          }
-          resolve(body.textContent.replace(/\s\s+/g, ' ').replace(/^\s*[\r\n]/gm, ''));
+          let main = html.querySelector("main,*[role='main'],body");
+          // if (main === null) {
+          //   main = html.querySelector("body");
+          // }
+          // const scripts = main.querySelectorAll("script,link,img,svg");
+          // for (const script of scripts) {
+          //   script.remove();
+          // }
+          resolve(body.innerText.replace(/\s\s+/g, ' ').replace(/^\s*[\r\n]/gm, ''));
         }
       };
       GM_xmlhttpRequest(options);
