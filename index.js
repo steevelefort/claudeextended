@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         ClaudeExtended
 // @namespace    http://tampermonkey.net/
-// @version      2024-05-26
+// @version      2024-05-31
 // @description  try to take over the world!
 // @author       Steeve Lefort
 // @match        https://claude.ai/*
