@@ -65,18 +65,15 @@
         onload: function(response) {
           const parser = new DOMParser();
           const html = parser.parseFromString(response.responseText, 'text/html');
-          const main = html.querySelector("main");
-          const body = html.querySelector("body");
+          let main = html.querySelector("main");
           if (main === null) {
-            const scripts = body.querySelectorAll("script,link,img,svg");
-            for (const script of scripts) {
-              script.remove();
-            }
-            resolve(body.textContent);
-          } else {
-            // const content = body.innerText;
-            resolve(main.textContent);
+            main = html.querySelector("body");
           }
+          const scripts = main.querySelectorAll("script,link,img,svg");
+          for (const script of scripts) {
+            script.remove();
+          }
+          resolve(body.textContent.replace(/\s\s+/g, ' ').replace(/^\s*[\r\n]/gm, ''));
         }
       };
       GM_xmlhttpRequest(options);
