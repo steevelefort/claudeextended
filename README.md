@@ -5,7 +5,7 @@ This is a Tampermonkey script for adding internet access to Claude 3.
 ## Installation
 
 In Tampermonkey, open the "Utilities" menu, and pick "Import from URL".  
-Enter the script URL, then press "Install".
+Enter the script URL (https://steevelefort.github.io/claudeextended/index.js), then press "Install".
 
 ## Usage
 
