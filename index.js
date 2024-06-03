@@ -73,7 +73,7 @@
           // for (const script of scripts) {
           //   script.remove();
           // }
-          resolve(body.innerText.replace(/\s\s+/g, ' ').replace(/^\s*[\r\n]/gm, ''));
+          resolve(main.innerText.replace(/\s\s+/g, ' ').replace(/^\s*[\r\n]/gm, ''));
         }
       };
       GM_xmlhttpRequest(options);
