@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name         ClaudeExtended
 // @namespace    http://tampermonkey.net/
-// @version      2024-05-31.2
-// @description  try to take over the world!
+// @version      2024-06-22
+// @description  Add Internet access to Claude AI
 // @author       Steeve Lefort
 // @match        https://claude.ai/*
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=claude.ai
@@ -13,10 +13,14 @@
 (function() {
   'use strict';
 
+  console.log("Démarrage de ClaudeExtended")
+
   const ddgBase = "https://html.duckduckgo.com/html?q=";
+  const endMark = " --- Search end ---";
 
   let editor = null;
   let waitPopup = null;
+  let searching = false;
 
   function search(text) {
     return new Promise((resolve, reject) => {
@@ -69,11 +73,11 @@
           // if (main === null) {
           //   main = html.querySelector("body");
           // }
-          // const scripts = main.querySelectorAll("script,link,img,svg");
-          // for (const script of scripts) {
-          //   script.remove();
-          // }
-          resolve(main.innerText.replace(/\s\s+/g, ' ').replace(/^\s*[\r\n]/gm, ''));
+          const scripts = main.querySelectorAll("script,link,img,svg,nav,header,footer,aside,style,noscript");
+          for (const script of scripts) {
+            script.remove();
+          }
+          resolve(main.textContent.replace(/\s\s+/g, ' ').replace(/^\s*[\r\n]/gm, ''));
         }
       };
       GM_xmlhttpRequest(options);
@@ -88,20 +92,25 @@
 
   async function run(text) {
     const urls = await search(text)
-    urls.splice(3); // Keeps only 3 results
+    // urls.splice(3); // Keeps only 3 results
+    urls.splice(1); // Keeps only the first result
 
     const promisesRedirect = [];
     for (const url of urls) {
       promisesRedirect.push(getRedirect(url));
     }
     const redirects = await Promise.all(promisesRedirect)
+    console.log(redirects)
 
     const promisesContent = [];
     for (const url of redirects) {
       promisesContent.push(getSite(url));
     }
     const contents = await Promise.all(promisesContent)
-    console.log(contents);
+    // console.log(contents);
+    for (const content of contents) {
+      console.log(content)
+    }
 
     let add = "\r\nInformation found on the Internet :\r\n";
 
@@ -109,14 +118,16 @@
       add += "\r\n------------------\r\n";
       add += content;
     }
+    add += endMark;
     insertAtEnd(add);
+    console.log("Insertion des résultats dans l’éditeur")
 
     // Ugly method to change !
-    setTimeout(() => {
-      const fireButton = document.querySelector("button[aria-label='Send Message']");
-      fireButton.click();
-      waitPopup.style.display = "none";
-    }, 500)
+    // setTimeout(() => {
+    //   const fireButton = document.querySelector("button[aria-label='Send Message']");
+    //   fireButton.click();
+    //   waitPopup.style.display = "none";
+    // }, 500)
 
   }
 
@@ -127,6 +138,37 @@
       const claudeExtend = document.querySelector(".claudeExtend");
       if (inputZone != null && claudeExtend == null) {
         editor = inputZone.editor;
+
+        const textZone = inputZone.querySelector("p")
+
+        const observer = new MutationObserver(function() {
+          console.log("Editeur modifié");
+          const markFound = textZone.textContent.slice(-endMark.length) == endMark;
+          if (searching && markFound) {
+            console.log("Recherche terminée")
+
+            const fireButton = document.querySelector("button[aria-label='Send Message'],div[cmdk-item]>button");
+            setTimeout(() => {
+              console.log("Pressing send message");
+              fireButton.click();
+              waitPopup.style.display = "none";
+              searching = false;
+            },100)
+          }
+
+        });
+
+        observer.observe(textZone, {
+          attributes: true,
+          childList: true,
+          subtree: true,
+          characterData: true
+        });
+
+
+
+
+
         const uploadButton = document.querySelector("input[aria-label='Upload files']")
         const sendButton = document.querySelector("input[aria-label='Send Message']")
 
@@ -143,16 +185,20 @@
         inputZone.parentNode.appendChild(searchInput);
 
         searchInput.placeholder = "Add a search engine query here if needed";
-        searchInput.style.border = "#aaa solid 1px";
-        searchInput.style.borderRadius = "10px";
-        searchInput.style.backgroundColor = "#333";
+        // searchInput.style.border = "#aaa solid 1px";
+        searchInput.style.border = "none";
+        // searchInput.style.borderRadius = "10px";
+        // searchInput.style.backgroundColor = "#333";
+        searchInput.style.backgroundColor = "inherit";
         searchInput.style.width = "100%";
         searchInput.style.marginTop = "10px";
         searchInput.style.padding = "8px";
 
         searchButton.addEventListener("click", () => {
 
-          waitPopup.style.display = "flex";
+          // waitPopup.style.display = "flex";
+          searching = true;
+
           if (searchInput.value.length > 0)
             run(searchInput.value);
           else {
