@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         ClaudeExtended
 // @namespace    http://tampermonkey.net/
-// @version      2024-06-22
+// @version      2024-06-22.2
 // @description  Add Internet access to Claude AI
 // @author       Steeve Lefort
 // @match        https://claude.ai/*
@@ -196,7 +196,7 @@
 
         searchButton.addEventListener("click", () => {
 
-          // waitPopup.style.display = "flex";
+          waitPopup.style.display = "flex";
           searching = true;
 
           if (searchInput.value.length > 0)
