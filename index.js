@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         ClaudeExtended
 // @namespace    http://tampermonkey.net/
-// @version      2024-06-22.2
+// @version      2024-07-01
 // @description  Add Internet access to Claude AI
 // @author       Steeve Lefort
 // @match        https://claude.ai/*
@@ -175,24 +175,22 @@
         const searchButton = document.createElement("button")
         searchButton.innerText = "🔍";
         searchButton.className = "claudeExtend";
-        uploadButton.parentNode.parentNode.parentNode.appendChild(searchButton);
+        inputZone.parentNode.parentNode.appendChild(searchButton);
         searchButton.style.padding = "4px 5px";
-        searchButton.style.marginRight = "5px";
         searchButton.style.borderRadius = "12px";
+        searchButton.style.width = "2rem";
+        searchButton.style.height = "2rem";
         searchButton.style.backgroundColor = "#07D";
 
         const searchInput = document.createElement("input");
-        inputZone.parentNode.appendChild(searchInput);
+        uploadButton.parentNode.parentNode.parentNode.appendChild(searchInput);
 
         searchInput.placeholder = "Add a search engine query here if needed";
-        // searchInput.style.border = "#aaa solid 1px";
         searchInput.style.border = "none";
-        // searchInput.style.borderRadius = "10px";
-        // searchInput.style.backgroundColor = "#333";
         searchInput.style.backgroundColor = "inherit";
         searchInput.style.width = "100%";
         searchInput.style.marginTop = "10px";
-        searchInput.style.padding = "8px";
+        searchInput.style.padding = "8px 16px";
 
         searchButton.addEventListener("click", () => {
 
