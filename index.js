@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         ClaudeExtended
 // @namespace    http://tampermonkey.net/
-// @version      2024-07-01
+// @version      2024-12-01
 // @description  Add Internet access to Claude AI
 // @author       Steeve Lefort
 // @match        https://claude.ai/*
@@ -90,6 +90,25 @@
     editor.view.dispatch(transaction);
   }
 
+  function insertHtmlAttachmentAtEnd(htmlContent) {
+    const endPos = editor.state.doc.content.size - 1;
+
+    // Créer le nœud de type attachment pour du HTML
+    const attachmentNode = editor.schema.nodes.attachment.create({
+      content: htmlContent.replace(/(\r?\n){2,}/g, '\n'),
+      type: 'text/html',  // Spécifier le type comme HTML
+      identifier: `html-${Date.now()}`,
+      title: `HTML Content ${new Date().toLocaleString()}`
+    });
+
+    // Insérer le nœud à la fin
+    const transaction = editor.state.tr.insert(endPos, attachmentNode);
+    editor.view.dispatch(transaction);
+  }
+
+  // Exemple d'utilisation :
+  // insertHtmlAttachmentAtEnd('<div class="example">Mon contenu HTML</div>');
+
   async function run(text) {
     const urls = await search(text)
     // urls.splice(3); // Keeps only 3 results
@@ -119,7 +138,8 @@
       add += content;
     }
     add += endMark;
-    insertAtEnd(add);
+    // insertAtEnd(add);
+    insertHtmlAttachmentAtEnd(add);
     console.log("Insertion des résultats dans l’éditeur")
 
     // Ugly method to change !
@@ -153,7 +173,7 @@
               fireButton.click();
               waitPopup.style.display = "none";
               searching = false;
-            },100)
+            }, 100)
           }
 
         });
